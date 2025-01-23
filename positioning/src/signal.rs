@@ -1,4 +1,4 @@
-use crate::Beacon;
+use crate::beacon::Id;
 use chrono::{DateTime, Utc};
 use crossbeam_channel::{select, tick, Receiver, Sender};
 use std::thread;
@@ -9,14 +9,14 @@ use crate::buffer::Buffer;
 
 #[derive(Debug, Clone)]
 pub struct Signal {
-    pub beacon: Beacon,
+    pub beacon: Id,
     pub tx_power: i8,
     pub rssi: i8,
     pub rx_ts: DateTime<Utc>,
 }
 
 impl Signal {
-    pub fn new(beacon: Beacon, tx_power: i8, rssi: i8) -> Self {
+    pub fn new(beacon: Id, tx_power: i8, rssi: i8) -> Self {
         Signal {
             beacon,
             tx_power,

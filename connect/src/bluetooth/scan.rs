@@ -1,5 +1,5 @@
 use positioning::signal::Signal;
-use positioning::Beacon;
+use positioning::beacon::Id;
 use crate::bluetooth::ibeacon::from_bytes;
 use crossbeam_channel::Sender;
 use esp32_nimble::{BLEAdvertisedData, BLEAdvertisedDevice, BLEDevice, BLEScan};
@@ -42,7 +42,7 @@ impl Scanner {
                             let minor = ibeacon.minor;
 
                             if let Err(e) = tx.send(Signal::new(
-                                Beacon::new(uuid, major, minor),
+                                Id::new(uuid, major, minor),
                                 ibeacon.power,
                                 device.rssi(),
                             )) {
