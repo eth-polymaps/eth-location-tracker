@@ -1,0 +1,17 @@
+[package]
+name = "connect"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+positioning = { path = "../positioning" }
+
+anyhow = { version = "1.0.95" }
+log = { version = "0.4", default-features = false }
+crossbeam-channel = "0.5.14"
+
+esp-idf-svc = { version = "0.50.1", default-features = false, features = ["alloc", "binstart", "std", "native"] }
+esp-idf-hal = { version = "0.45.1", default-features = false }
+esp-idf-sys = { version = "0.36.1", default-features = false }
+esp32-nimble = { version = "0.9.0" }
+embedded-svc = { version = "0.28.1" }

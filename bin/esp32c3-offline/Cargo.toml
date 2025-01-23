@@ -1,0 +1,27 @@
+[package]
+name = "esp32c3-offline"
+version = "0.1.0"
+authors = ["Raffael Schmid <raffael.schmid@cloudarchitects.ch>"]
+edition = "2021"  # Must be specified here too
+
+
+[[bin]]
+name = "esp32c3-offline"
+harness = false # do not use the built in cargo test harness -> resolve rust-analyzer errors
+
+
+[dependencies]
+positioning = { path = "../../positioning" }
+positioning-online = { path = "../../positioning-online" }
+connect = { path = "../../connect" }
+
+anyhow = { version = "1.0.95" }
+log = { version = "0.4", default-features = false }
+
+esp-idf-svc = { version = "0.50.1", default-features = false, features = ["alloc", "binstart", "std", "native"] }
+esp-idf-hal = { version = "0.45.1", default-features = false }
+
+crossbeam-channel = "0.5.14"
+
+[build-dependencies]
+embuild = { version = "0.33.0", features = ["espidf"] }
