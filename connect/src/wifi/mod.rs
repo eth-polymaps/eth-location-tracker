@@ -45,6 +45,7 @@ impl<'d> Wifi<'d> {
         self.esp_wifi.start()?;
         self.esp_wifi.connect()?;
 
+
         while !self.esp_wifi.is_connected()? {
             let config = self.esp_wifi.get_configuration()?;
             info!("Waiting for station {:?}", config);

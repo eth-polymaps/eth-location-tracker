@@ -6,10 +6,9 @@ use esp_idf_hal::peripherals::Peripherals;
 use esp_idf_hal::task::block_on;
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_svc::nvs::EspDefaultNvsPartition;
-use esp_idf_svc::sntp;
 use log::{error, info, LevelFilter};
-use std::thread;
 use positioning::signal::{Processor, Signal};
+use connect::timer;
 
 fn main() {
     let wifi_ssid = env!("WIFI_SSID");
@@ -32,22 +31,15 @@ fn main() {
     let mut wifi = Wifi::new(peripherals, sys_loop, nvs, wifi_ssid, wifi_password);
     wifi.connect().expect("Unable to start WIFI");
 
-    let sntp = sntp::EspSntp::new_default().expect("Unable to init time");
-    loop {
-        if sntp.get_sync_status() == sntp::SyncStatus::Completed {
-            break;
-        }
-        thread::sleep(std::time::Duration::from_millis(500));
-    }
+    timer::synchronize().expect("Unable to start timer");
 
     let (bluetooth_tx, bluetooth_rx) = unbounded();
     let (signal_tx, signal_rx) = unbounded::<Vec<Signal>>();
 
-    let locator = Locator::new(service_key, service_client_id, service_endpoint);
     let signal_processor = Processor::new();
+    let signal_processor_handle = signal_processor.start(bluetooth_rx, signal_tx);
 
-    let processor_thread = signal_processor.start(bluetooth_rx, signal_tx);
-
+    let locator = Locator::new(service_key, service_client_id, service_endpoint);
     let locator_thread = locator.start(signal_rx);
 
     block_on(async {
@@ -60,7 +52,7 @@ fn main() {
         Err(e) => error!("Locator thread panicked: {:?}", e),
     }
 
-    match processor_thread.join() {
+    match signal_processor_handle.join() {
         Ok(_) => info!("Signal processor thread completed successfully"),
         Err(e) => error!("Signal processor thread panicked: {:?}", e),
     }

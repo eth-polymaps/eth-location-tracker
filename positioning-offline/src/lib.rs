@@ -1,14 +1,28 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use positioning::signal::Signal;
+use crossbeam_channel::{select, Receiver};
+use log::info;
+use std::thread;
+use std::thread::JoinHandle;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub struct Locator {}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+impl Locator {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn start(self, rx: Receiver<Vec<Signal>>) -> JoinHandle<()> {
+        thread::spawn(move || {
+            loop {
+                select! {
+                    recv(rx) -> msg => match msg {
+                        Ok(m) => {
+                             info!("Received {} signals", m.len());
+                        }
+                        Err(_) => break,
+                    }
+                }
+            }
+        })
     }
 }

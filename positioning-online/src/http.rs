@@ -76,7 +76,7 @@ impl HttpClient {
     pub fn publish(
         &mut self,
         measurement: Vec<Signal>,
-    ) -> Result<positioning::location::Location, anyhow::Error> {
+    ) -> Result<positioning::geographic::Position, anyhow::Error> {
         let url = format!("{}/location/v1/positioning", self.hostname);
 
         let headers = [
@@ -128,8 +128,8 @@ impl HttpClient {
         }
 
         Ok(serde_json::from_slice::<ResponseBody>(&buf).map_or_else(
-            |_| positioning::location::Location::new(0.0, 0.0),
-            |value| positioning::location::Location::new(value.location.lat, value.location.lon),
+            |_| positioning::geographic::Position::new(0.0, 0.0),
+            |value| positioning::geographic::Position::new(value.location.lat, value.location.lon),
         ))
     }
 }

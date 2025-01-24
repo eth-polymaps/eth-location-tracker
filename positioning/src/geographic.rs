@@ -1,11 +1,11 @@
 #[derive(Debug, Clone)]
-pub struct Location {
+pub struct Position {
     pub lat: f64,
     pub lon: f64,
 }
 
-impl Location {
+impl Position {
     pub fn new(lat: f64, lon: f64) -> Self {
-        Location { lat, lon }
+        Position { lat, lon }
     }
 }
