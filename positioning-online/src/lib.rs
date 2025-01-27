@@ -1,10 +1,9 @@
 mod http;
 
-
-use positioning::signal::Signal;
 use crate::http::HttpClient;
-use crossbeam_channel::{select, Receiver};
+use crossbeam_channel::{Receiver, select};
 use log::{error, info};
+use positioning::signal::Signal;
 use std::thread;
 use std::thread::JoinHandle;
 

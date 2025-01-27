@@ -1,7 +1,7 @@
-use positioning::signal::Signal;
 use embedded_svc::http::client::Client;
 use esp_idf_svc::http::client::{Configuration, EspHttpConnection};
 use log::info;
+use positioning::signal::Signal;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;

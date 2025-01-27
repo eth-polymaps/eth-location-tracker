@@ -1,12 +1,12 @@
+use connect::bluetooth::scan::Scanner;
+use connect::timer;
+use connect::wifi::Wifi;
 use crossbeam_channel::unbounded;
 use esp_idf_hal::peripherals::Peripherals;
 use esp_idf_hal::task::block_on;
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_svc::nvs::EspDefaultNvsPartition;
 use log::{error, info, LevelFilter};
-use connect::bluetooth::scan::Scanner;
-use connect::timer;
-use connect::wifi::Wifi;
 use positioning::signal::{Processor, Signal};
 use positioning_offline::Locator;
 
@@ -40,10 +40,9 @@ fn main() {
     let locator_thread = locator.start(signal_rx);
 
     block_on(async {
-        let scanner = Scanner::new();
+        let scanner = Scanner::new(5000i32, 100, 50);
         scanner.scan_indefinit(bluetooth_tx).await;
     });
-
 
     match locator_thread.join() {
         Ok(_) => info!("Locator thread completed successfully"),

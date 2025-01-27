@@ -30,21 +30,26 @@ impl<'d> Wifi<'d> {
     }
 
     pub fn connect(&mut self) -> Result<(), anyhow::Error> {
-        let ssid = self.username.as_str().try_into()
+        let ssid = self
+            .username
+            .as_str()
+            .try_into()
             .map_err(|_| anyhow!("ssid does not fit into String<32> buffer"))?;
-        let password = self.password.as_str().try_into()
+        let password = self
+            .password
+            .as_str()
+            .try_into()
             .map_err(|_| anyhow!("password does not fit into String<32> buffer"))?;
 
         self.esp_wifi
             .set_configuration(&Configuration::Client(ClientConfiguration {
-                ssid: ssid,
-                password: password,
+                ssid,
+                password,
                 ..Default::default()
             }))?;
 
         self.esp_wifi.start()?;
         self.esp_wifi.connect()?;
-
 
         while !self.esp_wifi.is_connected()? {
             let config = self.esp_wifi.get_configuration()?;

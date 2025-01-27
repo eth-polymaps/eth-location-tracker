@@ -1,11 +1,10 @@
 use crate::beacon::Id;
-use chrono::{DateTime, Utc, Duration};
-use crossbeam_channel::{select, tick, Receiver, Sender};
-use std::thread;
-use std::thread::JoinHandle;
+use chrono::{DateTime, Duration, Utc};
+use crossbeam_channel::{Receiver, Sender, select, tick};
 use log::{error, info};
 use std::collections::VecDeque;
-
+use std::thread;
+use std::thread::JoinHandle;
 
 #[derive(Debug, Clone)]
 pub struct Signal {
@@ -29,9 +28,12 @@ impl Signal {
 #[derive(Default)]
 pub struct Processor {}
 
-
 impl Processor {
-    pub fn start(&self, rx_bluetooth: Receiver<Signal>, tx_signals: Sender<Vec<Signal>>) -> JoinHandle<()> {
+    pub fn start(
+        &self,
+        rx_bluetooth: Receiver<Signal>,
+        tx_signals: Sender<Vec<Signal>>,
+    ) -> JoinHandle<()> {
         thread::spawn(move || {
             let mut buffer = Buffer::new(20);
             let ticker = tick(std::time::Duration::from_secs(5));
@@ -56,7 +58,6 @@ impl Processor {
         })
     }
 }
-
 
 pub struct Buffer {
     signals: VecDeque<Signal>, // VecDeque to store the signals

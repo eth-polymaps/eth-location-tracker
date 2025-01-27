@@ -1,6 +1,6 @@
+use esp_idf_svc::sntp;
 use std::thread::sleep;
 use std::time::Duration;
-use esp_idf_svc::sntp;
 
 pub fn synchronize() -> Result<(), anyhow::Error> {
     let sntp = sntp::EspSntp::new_default()?;
