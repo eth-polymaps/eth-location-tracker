@@ -4,13 +4,10 @@ use log::info;
 use std::thread;
 use std::thread::JoinHandle;
 
+#[derive(Default)]
 pub struct Locator {}
 
 impl Locator {
-    pub fn new() -> Self {
-        Self {}
-    }
-
     pub fn start(self, rx: Receiver<Vec<Signal>>) -> JoinHandle<()> {
         thread::spawn(move || {
             loop {

@@ -26,13 +26,8 @@ impl Signal {
     }
 }
 
+#[derive(Default)]
 pub struct Processor {}
-
-impl Processor {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
 
 
 impl Processor {

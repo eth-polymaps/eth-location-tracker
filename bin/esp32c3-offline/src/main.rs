@@ -33,10 +33,10 @@ fn main() {
     let (bluetooth_tx, bluetooth_rx) = unbounded();
     let (signal_tx, signal_rx) = unbounded::<Vec<Signal>>();
 
-    let signal_processor = Processor::new();
+    let signal_processor = Processor::default();
     let signal_processor_handle = signal_processor.start(bluetooth_rx, signal_tx);
 
-    let locator = Locator::new();
+    let locator = Locator::default();
     let locator_thread = locator.start(signal_rx);
 
     block_on(async {

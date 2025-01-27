@@ -36,7 +36,7 @@ fn main() {
     let (bluetooth_tx, bluetooth_rx) = unbounded();
     let (signal_tx, signal_rx) = unbounded::<Vec<Signal>>();
 
-    let signal_processor = Processor::new();
+    let signal_processor = Processor::default();
     let signal_processor_handle = signal_processor.start(bluetooth_rx, signal_tx);
 
     let locator = Locator::new(service_key, service_client_id, service_endpoint);
