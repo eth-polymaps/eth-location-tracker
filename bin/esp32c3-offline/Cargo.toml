@@ -15,12 +15,13 @@ positioning = { path = "../../positioning" }
 positioning-offline = { path = "../../positioning-offline" }
 connect = { path = "../../connect" }
 beacons = { path = "../../beacons", features = ["HCI"] }
-log = { version = "0.4", default-features = false }
 
-esp-idf-svc = { version = "0.50.1", default-features = false, features = ["alloc", "binstart", "std", "native"] }
-esp-idf-hal = { version = "0.45.1", default-features = false }
 
-crossbeam-channel = "0.5.14"
+esp-idf-svc = { workspace = true }
+esp-idf-hal = { workspace = true }
+
+log = { workspace = true }
+crossbeam-channel = { workspace = true }
 
 [build-dependencies]
 embuild = { version = "0.33.0", features = ["espidf"] }

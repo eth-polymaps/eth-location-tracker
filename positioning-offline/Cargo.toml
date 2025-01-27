@@ -4,8 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-"positioning" = {path = "../positioning"}
+"positioning" = { path = "../positioning" }
 
-anyhow = { version = "1.0.95" }
-log = { version = "0.4", default-features = false }
-crossbeam-channel = "0.5.14"
+log = { workspace = true }
+crossbeam-channel = { workspace = true }
