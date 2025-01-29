@@ -34,28 +34,32 @@ impl Processor {
         rx_bluetooth: Receiver<Signal>,
         tx_signals: Sender<Vec<Signal>>,
     ) -> JoinHandle<()> {
-        thread::spawn(move || {
-            let mut buffer = Buffer::new(20);
-            let ticker = tick(std::time::Duration::from_secs(5));
+        thread::Builder::new()
+            .name("processor".to_string())
+            .stack_size(8 * 1024) // 8 KB stack
+            .spawn(move || {
+                let mut buffer = Buffer::new(20);
+                let ticker = tick(std::time::Duration::from_secs(5));
 
-            loop {
-                select! {
-                    recv(rx_bluetooth) -> signal => match signal {
-                        Ok(m) => {
-                            info!("received {:?}", m);
-                            buffer.push(m);
-                        }
-                        Err(e) => error!("error receiving signal: {:?}", e),
-                    },
+                loop {
+                    select! {
+                        recv(rx_bluetooth) -> signal => match signal {
+                            Ok(m) => {
+                                info!("received {:?}", m);
+                                buffer.push(m);
+                            }
+                            Err(e) => error!("error receiving signal: {:?}", e),
+                        },
 
-                    recv(ticker) -> _ => {
-                        if let Err(e) =  tx_signals.send(buffer.get_recent_signals()){
-                            error!("error sending signals: {:?}", e);
+                        recv(ticker) -> _ => {
+                            if let Err(e) =  tx_signals.send(buffer.get_recent_signals()){
+                                error!("error sending signals: {:?}", e);
+                            }
                         }
                     }
                 }
-            }
-        })
+            })
+            .expect("cannot spawn display updater thread")
     }
 }
 

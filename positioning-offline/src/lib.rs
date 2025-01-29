@@ -9,17 +9,21 @@ pub struct Locator {}
 
 impl Locator {
     pub fn start(self, rx: Receiver<Vec<Signal>>) -> JoinHandle<()> {
-        thread::spawn(move || {
-            loop {
-                select! {
-                    recv(rx) -> msg => match msg {
-                        Ok(m) => {
-                             info!("Received {} signals", m.len());
+        thread::Builder::new()
+            .name("locator".to_string())
+            .stack_size(8 * 1024) // 8 KB stack
+            .spawn(move || {
+                loop {
+                    select! {
+                        recv(rx) -> msg => match msg {
+                            Ok(m) => {
+                                 info!("Received {} signals", m.len());
+                            }
+                            Err(_) => break,
                         }
-                        Err(_) => break,
                     }
                 }
-            }
-        })
+            })
+            .expect("cannot spawn locator thread")
     }
 }

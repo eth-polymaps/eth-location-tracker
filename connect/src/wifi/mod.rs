@@ -1,32 +1,33 @@
 use embedded_svc::wifi::{ClientConfiguration, Configuration};
-use esp_idf_hal::peripherals::Peripherals;
 use esp_idf_svc::eventloop::{EspEventLoop, System};
 use esp_idf_svc::nvs::{EspNvsPartition, NvsDefault};
-use esp_idf_svc::wifi::EspWifi;
+use esp_idf_svc::wifi::{BlockingWifi, EspWifi};
 use log::info;
-use std::thread::sleep;
-use std::time::Duration;
 
 use anyhow::anyhow;
+use esp_idf_hal::modem;
+
 pub struct Wifi<'d> {
     username: String,
     password: String,
-    esp_wifi: EspWifi<'d>,
+    blocking_wifi: BlockingWifi<EspWifi<'d>>,
 }
 
 impl<'d> Wifi<'d> {
     pub fn new(
-        peripherals: Peripherals,
+        modem: modem::Modem,
         sys_loop: EspEventLoop<System>,
         nvs: EspNvsPartition<NvsDefault>,
         username: &str,
         password: &str,
-    ) -> Wifi<'d> {
-        Wifi {
+    ) -> anyhow::Result<Wifi<'d>> {
+        let wifi = EspWifi::new(modem, sys_loop.clone(), Some(nvs))?;
+        let blocking_wifi = BlockingWifi::wrap(wifi, sys_loop)?;
+        Ok(Wifi {
             username: username.to_string(),
             password: password.to_string(),
-            esp_wifi: EspWifi::new(peripherals.modem, sys_loop, Some(nvs)).unwrap(),
-        }
+            blocking_wifi,
+        })
     }
 
     pub fn connect(&mut self) -> Result<(), anyhow::Error> {
@@ -41,27 +42,20 @@ impl<'d> Wifi<'d> {
             .try_into()
             .map_err(|_| anyhow!("password does not fit into String<32> buffer"))?;
 
-        self.esp_wifi
+        self.blocking_wifi
             .set_configuration(&Configuration::Client(ClientConfiguration {
                 ssid,
                 password,
                 ..Default::default()
             }))?;
 
-        self.esp_wifi.start()?;
-        self.esp_wifi.connect()?;
+        self.blocking_wifi.start()?;
+        self.blocking_wifi.connect()?;
 
-        while !self.esp_wifi.is_connected()? {
-            let config = self.esp_wifi.get_configuration()?;
-            info!("Waiting for station {:?}", config);
-        }
-
-        info!("Should be connected now");
-        sleep(Duration::new(2, 0));
-
-        info!("IP info: {:?}", self.esp_wifi.sta_netif().get_ip_info()?);
-
-        info!("IP info: {:?}", self.esp_wifi.sta_netif().get_ip_info()?);
+        info!(
+            "IP info: {:?}",
+            self.blocking_wifi.wifi().sta_netif().get_ip_info()?
+        );
 
         Ok(())
     }

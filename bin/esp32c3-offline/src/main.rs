@@ -6,7 +6,7 @@ use esp_idf_hal::peripherals::Peripherals;
 use esp_idf_hal::task::block_on;
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_svc::nvs::EspDefaultNvsPartition;
-use log::{error, info, LevelFilter};
+use log::{LevelFilter, error, info};
 use positioning::signal::{Processor, Signal};
 use positioning_offline::Locator;
 
@@ -25,7 +25,7 @@ fn main() {
     let sys_loop = EspSystemEventLoop::take().unwrap();
     let nvs = EspDefaultNvsPartition::take().unwrap();
 
-    let mut wifi = Wifi::new(peripherals, sys_loop, nvs, wifi_ssid, wifi_password);
+    let mut wifi = Wifi::new(peripherals.modem, sys_loop, nvs, wifi_ssid, wifi_password).unwrap();
     wifi.connect().expect("Unable to start WIFI");
 
     timer::synchronize().expect("Unable to start timer");

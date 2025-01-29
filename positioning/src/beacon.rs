@@ -16,14 +16,18 @@ impl Id {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Location {
+#[derive(Debug, Clone, Default)]
+pub struct Room {
     pub building: String,
     pub floor: String,
     pub room: String,
 }
 
-impl Location {
+impl Room {
+    pub fn identifier(&self) -> String {
+        format!("{}/{}/{}", self.building, self.floor, self.room)
+    }
+
     pub fn new(building: &str, floor: &str, room: &str) -> Self {
         Self {
             building: building.to_owned(),
@@ -37,11 +41,11 @@ impl Location {
 pub struct Beacon {
     pub id: Id,
     pub position: Position,
-    pub location: Location,
+    pub location: Room,
 }
 
 impl Beacon {
-    pub fn new(id: Id, position: Position, location: Location) -> Self {
+    pub fn new(id: Id, position: Position, location: Room) -> Self {
         Self {
             id,
             position,

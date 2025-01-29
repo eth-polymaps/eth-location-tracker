@@ -2,7 +2,7 @@
 name = "esp32c3-online"
 version = "0.1.0"
 authors = ["Raffael Schmid <raffael.schmid@cloudarchitects.ch>"]
-edition = "2021"  # Must be specified here too
+edition = "2024"  # Must be specified here too
 
 
 [[bin]]
@@ -20,6 +20,9 @@ crossbeam-channel = { workspace = true }
 
 esp-idf-svc = { workspace = true }
 esp-idf-hal = { workspace = true }
+ssd1306 = { workspace = true }
+embedded-graphics = { workspace = true }
+anyhow = { workspace = true }
 
 
 [build-dependencies]

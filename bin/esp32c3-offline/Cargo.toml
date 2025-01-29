@@ -2,7 +2,7 @@
 name = "esp32c3-offline"
 version = "0.1.0"
 authors = ["Raffael Schmid <raffael.schmid@cloudarchitects.ch>"]
-edition = "2021"  # Must be specified here too
+edition = "2024"
 
 
 [[bin]]
