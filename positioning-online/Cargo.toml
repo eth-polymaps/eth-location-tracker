@@ -12,9 +12,9 @@ crossbeam-channel = "0.5.14"
 serde = { version = "1.0.217", features = ["derive"] }
 serde_json = { version = "1.0" }
 
-esp-idf-svc = { version = "0.50.1", default-features = false, features = ["alloc", "binstart", "std", "native"] }
-esp-idf-hal = { version = "0.45.1", default-features = false }
-esp-idf-sys = { version = "0.36.1", default-features = false }
-esp32-nimble = { version = "0.9.0" }
-embedded-svc = { version = "0.28.1" }
+esp-idf-svc = { workspace = true }
+esp-idf-hal = { workspace = true }
+esp-idf-sys = { workspace = true }
+esp32-nimble = { workspace = true }
+embedded-svc = { workspace = true }
 

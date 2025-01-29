@@ -2,7 +2,7 @@
 name = "esp32c3-offline"
 version = "0.1.0"
 authors = ["Raffael Schmid <raffael.schmid@cloudarchitects.ch>"]
-edition = "2021"  # Must be specified here too
+edition = "2024"
 
 
 [[bin]]
@@ -12,16 +12,16 @@ harness = false # do not use the built in cargo test harness -> resolve rust-ana
 
 [dependencies]
 positioning = { path = "../../positioning" }
-positioning-online = { path = "../../positioning-online" }
+positioning-offline = { path = "../../positioning-offline" }
 connect = { path = "../../connect" }
+beacons = { path = "../../beacons", features = ["HCI"] }
 
-anyhow = { version = "1.0.95" }
-log = { version = "0.4", default-features = false }
 
-esp-idf-svc = { version = "0.50.1", default-features = false, features = ["alloc", "binstart", "std", "native"] }
-esp-idf-hal = { version = "0.45.1", default-features = false }
+esp-idf-svc = { workspace = true }
+esp-idf-hal = { workspace = true }
 
-crossbeam-channel = "0.5.14"
+log = { workspace = true }
+crossbeam-channel = { workspace = true }
 
 [build-dependencies]
 embuild = { version = "0.33.0", features = ["espidf"] }

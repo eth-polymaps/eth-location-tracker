@@ -1,7 +1,9 @@
-use positioning::signal::Signal;
 use embedded_svc::http::client::Client;
 use esp_idf_svc::http::client::{Configuration, EspHttpConnection};
-use log::info;
+use log::debug;
+use positioning::beacon;
+use positioning::geographic::Position;
+use positioning::signal::Signal;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -42,6 +44,9 @@ struct ResponseBody {
     #[serde(rename = "location")]
     pub location: Location,
 
+    #[serde(rename = "indoor")]
+    pub indoor: Room,
+
     #[serde(flatten)]
     extra_fields: HashMap<String, Value>, // captures unknown fields
 }
@@ -52,6 +57,16 @@ struct Location {
     pub lat: f64,
     #[serde(rename = "lon")]
     pub lon: f64,
+}
+
+#[derive(Serialize, Deserialize)]
+struct Room {
+    #[serde(rename = "building")]
+    pub building: String,
+    #[serde(rename = "floor")]
+    pub floor: String,
+    #[serde(rename = "room")]
+    pub room: String,
 }
 
 impl HttpClient {
@@ -76,7 +91,7 @@ impl HttpClient {
     pub fn publish(
         &mut self,
         measurement: Vec<Signal>,
-    ) -> Result<positioning::location::Location, anyhow::Error> {
+    ) -> Result<(Position, beacon::Room), anyhow::Error> {
         let url = format!("{}/location/v1/positioning", self.hostname);
 
         let headers = [
@@ -103,7 +118,7 @@ impl HttpClient {
 
         let body_json: String = serde_json::to_string(&req)?;
 
-        info!("calling api POST {} with body: {}", url, body_json);
+        debug!("calling api {} with body: {}", url, body_json);
 
         let mut request = self.http.post(url.as_str(), &headers)?;
         request.connection().write(body_json.as_bytes())?;
@@ -128,8 +143,16 @@ impl HttpClient {
         }
 
         Ok(serde_json::from_slice::<ResponseBody>(&buf).map_or_else(
-            |_| positioning::location::Location::new(0.0, 0.0),
-            |value| positioning::location::Location::new(value.location.lat, value.location.lon),
+            |_| (Position::default(), beacon::Room::default()),
+            |res| {
+                let room = beacon::Room::new(
+                    res.indoor.building.as_str(),
+                    res.indoor.floor.as_str(),
+                    res.indoor.room.as_str(),
+                );
+                let pos = Position::new(res.location.lat, res.location.lon);
+                (pos, room)
+            },
         ))
     }
 }

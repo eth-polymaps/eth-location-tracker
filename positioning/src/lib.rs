@@ -1,6 +1,4 @@
-pub mod buffer;
-pub mod location;
+pub mod geographic;
 pub mod signal;
 
 pub mod beacon;
-

@@ -1,9 +1,9 @@
-use positioning::signal::Signal;
-use positioning::beacon::Id;
 use crate::bluetooth::ibeacon::from_bytes;
 use crossbeam_channel::Sender;
 use esp32_nimble::{BLEAdvertisedData, BLEAdvertisedDevice, BLEDevice, BLEScan};
 use log::{debug, error};
+use positioning::beacon::Id;
+use positioning::signal::Signal;
 
 pub struct Scanner {
     scan_time_ms: i32,
@@ -14,11 +14,11 @@ pub struct Scanner {
 const ETH_BEACON_UUID: &str = "58793564-459c-548d-bfcc-367ffd4fcd70";
 
 impl Scanner {
-    pub fn new() -> Self {
+    pub fn new(scan_time_ms: i32, scan_interval_ms: u16, scan_window_ms: u16) -> Self {
         Scanner {
-            scan_time_ms: 5000i32,
-            scan_interval_ms: 100,
-            scan_window_ms: 50,
+            scan_time_ms,
+            scan_interval_ms,
+            scan_window_ms,
         }
     }
 

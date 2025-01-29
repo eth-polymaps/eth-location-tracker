@@ -1,14 +1,29 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+use crossbeam_channel::{Receiver, select};
+use log::info;
+use positioning::signal::Signal;
+use std::thread;
+use std::thread::JoinHandle;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Default)]
+pub struct Locator {}
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+impl Locator {
+    pub fn start(self, rx: Receiver<Vec<Signal>>) -> JoinHandle<()> {
+        thread::Builder::new()
+            .name("locator".to_string())
+            .stack_size(8 * 1024) // 8 KB stack
+            .spawn(move || {
+                loop {
+                    select! {
+                        recv(rx) -> msg => match msg {
+                            Ok(m) => {
+                                 info!("Received {} signals", m.len());
+                            }
+                            Err(_) => break,
+                        }
+                    }
+                }
+            })
+            .expect("cannot spawn locator thread")
     }
 }
