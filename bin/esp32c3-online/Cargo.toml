@@ -17,12 +17,10 @@ connect = { path = "../../connect" }
 
 log = { workspace = true }
 crossbeam-channel = { workspace = true }
+anyhow = { workspace = true }
 
 esp-idf-svc = { workspace = true }
 esp-idf-hal = { workspace = true }
-ssd1306 = { workspace = true }
-embedded-graphics = { workspace = true }
-anyhow = { workspace = true }
 
 
 [build-dependencies]

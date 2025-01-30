@@ -15,3 +15,5 @@ esp-idf-hal = { workspace = true }
 esp-idf-sys = { workspace = true }
 esp32-nimble = { workspace = true }
 embedded-svc = { workspace = true }
+ssd1306 = { workspace = true }
+embedded-graphics = { workspace = true }

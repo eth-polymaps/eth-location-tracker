@@ -1,6 +1,6 @@
 use anyhow::Context;
 use connect::bluetooth::scan::Scanner;
-use connect::timer;
+use connect::logging;
 use connect::wifi::Wifi;
 use crossbeam_channel::{select, unbounded};
 use esp_idf_hal::peripherals::Peripherals;
@@ -8,27 +8,10 @@ use esp_idf_hal::task::block_on;
 use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_svc::nvs::EspDefaultNvsPartition;
 use log::{LevelFilter, error, info};
-use positioning::beacon::Room;
-use positioning::geographic::Position;
+use positioning::beacon::{BeaconId, Output};
 use positioning::signal::{Processor, Signal};
 use positioning_online::Locator;
 use std::thread;
-
-pub mod display;
-
-unsafe extern "C" {
-    fn esp_log_level_set(tag: *const u8, level: u32);
-}
-
-// Disables all logs for this module
-const ESP_LOG_NONE: u32 = 0;
-
-fn disable_nimble_logs() {
-    let tag = b"NimBLE\0"; // C-style null-terminated string
-    unsafe {
-        esp_log_level_set(tag.as_ptr(), ESP_LOG_NONE);
-    }
-}
 
 fn main() {
     let wifi_ssid = env!("WIFI_SSID");
@@ -42,8 +25,8 @@ fn main() {
     esp_idf_svc::sys::link_patches();
 
     esp_idf_svc::log::EspLogger::initialize_default();
-    disable_nimble_logs();
     log::set_max_level(LevelFilter::Info);
+    logging::disable_logs("NimBLE").expect("NimBLE disabled");
 
     let peripherals = Peripherals::take().unwrap();
     let sys_loop = EspSystemEventLoop::take().unwrap();
@@ -51,13 +34,11 @@ fn main() {
 
     let mut wifi = Wifi::new(peripherals.modem, sys_loop, nvs, wifi_ssid, wifi_password)
         .expect("Error while creating wifi");
-    wifi.connect().expect("Unable to start WIFI");
-
-    timer::synchronize().expect("Unable to start timer");
+    wifi.connect(true).expect("Unable to start WIFI");
 
     let (bluetooth_tx, bluetooth_rx) = unbounded();
-    let (signal_tx, signal_rx) = unbounded::<Vec<Signal>>();
-    let (position_tx, position_rx) = unbounded::<(Position, Room)>();
+    let (signal_tx, signal_rx) = unbounded::<Vec<Signal<BeaconId>>>();
+    let (position_tx, position_rx) = unbounded::<Output>();
 
     let signal_processor = Processor::default();
     let signal_processor_handle = signal_processor.start(bluetooth_rx, signal_tx);
@@ -71,7 +52,7 @@ fn main() {
         .name("display updater".to_string())
         .stack_size(8 * 1024)
         .spawn(move || {
-            let mut display = display::ssd1306::OLED::new(
+            let mut display = connect::display::ssd1306::Oled::new(
                 peripherals.i2c0,
                 peripherals.pins.gpio5.into(),
                 peripherals.pins.gpio4.into(),
@@ -79,7 +60,7 @@ fn main() {
             .context("Error creating display")
             .unwrap();
 
-            if let Err(e) = display.lat_lon(Position::default(), Room::default()) {
+            if let Err(e) = display.lat_lon(Output::default()) {
                 error!("Error writing display: {:?}", e);
                 return;
             }
@@ -87,9 +68,9 @@ fn main() {
             loop {
                 select! {
                     recv(position_rx) -> enc => match enc {
-                        Ok((pos, room)) => {
-                           info!("Sending position {:?} and room {:?} to display", pos, room);
-                           if let Err(e) = display.lat_lon(pos, room) {
+                        Ok(output) => {
+                           info!("Sending position {:?} and room {:?} to display", output.position, output.location);
+                           if let Err(e) = display.lat_lon(output) {
                                 error!("Error writing display from chan: {:?}", e);
                                 return;
                             }
@@ -122,6 +103,4 @@ fn main() {
         Ok(_) => info!("Display updater thread joined"),
         Err(_) => error!("Display updater thread panicked"),
     }
-
-    info!("Scan done");
 }

@@ -14,14 +14,14 @@ harness = false # do not use the built in cargo test harness -> resolve rust-ana
 positioning = { path = "../../positioning" }
 positioning-offline = { path = "../../positioning-offline" }
 connect = { path = "../../connect" }
-beacons = { path = "../../beacons", features = ["HCI"] }
 
+log = { workspace = true }
+crossbeam-channel = { workspace = true }
+anyhow = { workspace = true }
 
 esp-idf-svc = { workspace = true }
 esp-idf-hal = { workspace = true }
 
-log = { workspace = true }
-crossbeam-channel = { workspace = true }
 
 [build-dependencies]
 embuild = { version = "0.33.0", features = ["espidf"] }

@@ -1,9 +1,9 @@
 use embedded_svc::http::client::Client;
 use esp_idf_svc::http::client::{Configuration, EspHttpConnection};
 use log::debug;
-use positioning::beacon;
-use positioning::geographic::Position;
+use positioning::beacon::{BeaconId, Output};
 use positioning::signal::Signal;
+use positioning::{beacon, geographic};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;
@@ -47,6 +47,12 @@ struct ResponseBody {
     #[serde(rename = "indoor")]
     pub indoor: Room,
 
+    #[serde(rename = "speed")]
+    pub speed: Option<f32>,
+
+    #[serde(rename = "heading")]
+    pub heading: Option<i32>,
+
     #[serde(flatten)]
     extra_fields: HashMap<String, Value>, // captures unknown fields
 }
@@ -88,10 +94,7 @@ impl HttpClient {
         }
     }
 
-    pub fn publish(
-        &mut self,
-        measurement: Vec<Signal>,
-    ) -> Result<(Position, beacon::Room), anyhow::Error> {
+    pub fn locate(&mut self, measurement: Vec<Signal<BeaconId>>) -> Result<Output, anyhow::Error> {
         let url = format!("{}/location/v1/positioning", self.hostname);
 
         let headers = [
@@ -143,15 +146,18 @@ impl HttpClient {
         }
 
         Ok(serde_json::from_slice::<ResponseBody>(&buf).map_or_else(
-            |_| (Position::default(), beacon::Room::default()),
+            |_| Output::default(),
             |res| {
-                let room = beacon::Room::new(
-                    res.indoor.building.as_str(),
-                    res.indoor.floor.as_str(),
-                    res.indoor.room.as_str(),
-                );
-                let pos = Position::new(res.location.lat, res.location.lon);
-                (pos, room)
+                Output::new(
+                    geographic::Position::new(res.location.lat, res.location.lon),
+                    beacon::Room::new(
+                        res.indoor.building.as_str(),
+                        res.indoor.floor.as_str(),
+                        res.indoor.room.as_str(),
+                    ),
+                    res.speed,
+                    res.heading,
+                )
             },
         ))
     }
