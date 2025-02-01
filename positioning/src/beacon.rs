@@ -1,17 +1,33 @@
 use crate::geographic::Position;
 
 #[derive(Debug, Clone)]
-pub struct Id {
+pub struct BeaconId {
     pub uuid: String,
     pub major: u16,
     pub minor: u16,
 }
-impl Id {
+impl BeaconId {
     pub fn new(uuid: &str, major: u16, minor: u16) -> Self {
-        Id {
+        BeaconId {
             uuid: uuid.to_string(),
             major,
             minor,
+        }
+    }
+}
+#[derive(Debug, Clone)]
+pub struct Beacon {
+    pub id: BeaconId,
+    pub location: Room,
+    pub position: Position,
+}
+
+impl Beacon {
+    pub fn new(id: BeaconId, location: Room, position: Position) -> Self {
+        Self {
+            id,
+            location,
+            position,
         }
     }
 }
@@ -37,19 +53,26 @@ impl Room {
     }
 }
 
-#[derive(Debug, Clone)]
-pub struct Beacon {
-    pub id: Id,
+#[derive(Debug, Clone, Default)]
+pub struct Output {
     pub position: Position,
     pub location: Room,
+    pub speed: Option<f32>,
+    pub heading: Option<i32>,
 }
 
-impl Beacon {
-    pub fn new(id: Id, position: Position, location: Room) -> Self {
+impl Output {
+    pub fn new(
+        position: Position,
+        location: Room,
+        speed: Option<f32>,
+        heading: Option<i32>,
+    ) -> Self {
         Self {
-            id,
             position,
             location,
+            speed,
+            heading,
         }
     }
 }

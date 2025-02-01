@@ -1,8 +1,8 @@
-use crate::bluetooth::ibeacon::from_bytes;
+use crate::bluetooth::ibeacon;
 use crossbeam_channel::Sender;
 use esp32_nimble::{BLEAdvertisedData, BLEAdvertisedDevice, BLEDevice, BLEScan};
 use log::{debug, error};
-use positioning::beacon::Id;
+use positioning::beacon::BeaconId;
 use positioning::signal::Signal;
 
 pub struct Scanner {
@@ -22,7 +22,7 @@ impl Scanner {
         }
     }
 
-    pub async fn scan_indefinit(&self, tx: Sender<Signal>) {
+    pub async fn scan_indefinit(&self, tx: Sender<Signal<BeaconId>>) {
         let ble_device = BLEDevice::take();
         let mut ble_scan = BLEScan::new();
         loop {
@@ -34,7 +34,7 @@ impl Scanner {
                     ble_device,
                     self.scan_time_ms,
                     |device: &BLEAdvertisedDevice, data: BLEAdvertisedData<&[u8]>| {
-                        if let Some(ibeacon) = from_bytes(data.payload())
+                        if let Some(ibeacon) = ibeacon::read_bytes(data.payload())
                             .take_if(|ibeacon| ETH_BEACON_UUID.eq(&ibeacon.uuid))
                         {
                             let uuid = ibeacon.uuid.as_str();
@@ -42,7 +42,7 @@ impl Scanner {
                             let minor = ibeacon.minor;
 
                             if let Err(e) = tx.send(Signal::new(
-                                Id::new(uuid, major, minor),
+                                BeaconId::new(uuid, major, minor),
                                 ibeacon.power,
                                 device.rssi(),
                             )) {

@@ -6,16 +6,19 @@ pub struct IBeaconData {
     pub power: i8,
 }
 
-pub fn from_bytes(payload: &[u8]) -> Option<IBeaconData> {
+pub fn read_bytes(payload: &[u8]) -> Option<IBeaconData> {
     const IBEACON_PREFIX: [u8; 4] = [0x4c, 0x00, 0x02, 0x15];
 
     if payload.is_empty() {
         return None;
     }
 
-    // Find iBeacon prefix in the payload
     let mut i = 0;
     while i < payload.len() - 4 {
+        if payload.len() <= i + 4 {
+            return None;
+        }
+
         if payload[i..i + 4] == IBEACON_PREFIX {
             // Found iBeacon prefix, now parse the data
             let start_idx = i + 4;

@@ -1,4 +1,4 @@
-use crate::beacon::Id;
+use crate::beacon::BeaconId;
 use chrono::{DateTime, Duration, Utc};
 use crossbeam_channel::{Receiver, Sender, select, tick};
 use log::{error, info};
@@ -7,20 +7,31 @@ use std::thread;
 use std::thread::JoinHandle;
 
 #[derive(Debug, Clone)]
-pub struct Signal {
-    pub beacon: Id,
+pub struct Signal<T> {
+    pub beacon: T,
     pub tx_power: i8,
     pub rssi: i8,
     pub rx_ts: DateTime<Utc>,
+    pub distance: Option<f64>,
 }
 
-impl Signal {
-    pub fn new(beacon: Id, tx_power: i8, rssi: i8) -> Self {
+impl<T> Signal<T> {
+    pub fn with_distance(self, distance: f64) -> Signal<T> {
+        Self {
+            distance: Some(distance),
+            ..self
+        }
+    }
+}
+
+impl<T: Clone> Signal<T> {
+    pub fn new(beacon: T, tx_power: i8, rssi: i8) -> Self {
         Signal {
             beacon,
             tx_power,
             rssi,
             rx_ts: Utc::now(),
+            distance: None,
         }
     }
 }
@@ -31,8 +42,8 @@ pub struct Processor {}
 impl Processor {
     pub fn start(
         &self,
-        rx_bluetooth: Receiver<Signal>,
-        tx_signals: Sender<Vec<Signal>>,
+        rx_bluetooth: Receiver<Signal<BeaconId>>,
+        tx_signals: Sender<Vec<Signal<BeaconId>>>,
     ) -> JoinHandle<()> {
         thread::Builder::new()
             .name("processor".to_string())
@@ -45,7 +56,7 @@ impl Processor {
                     select! {
                         recv(rx_bluetooth) -> signal => match signal {
                             Ok(m) => {
-                                info!("received {:?}", m);
+                                info!("pushing signal {:?}", m);
                                 buffer.push(m);
                             }
                             Err(e) => error!("error receiving signal: {:?}", e),
@@ -63,11 +74,12 @@ impl Processor {
     }
 }
 
-pub struct Buffer {
-    signals: VecDeque<Signal>, // VecDeque to store the signals
+pub struct Buffer<T: Clone> {
+    signals: VecDeque<Signal<T>>, // VecDeque to store the signals
     max_size: usize,
 }
-impl Buffer {
+
+impl<T: Clone> Buffer<T> {
     pub fn new(max_size: usize) -> Self {
         Buffer {
             signals: VecDeque::with_capacity(max_size),
@@ -75,19 +87,19 @@ impl Buffer {
         }
     }
 
-    pub fn push(&mut self, signal: Signal) {
+    pub fn push(&mut self, signal: Signal<T>) {
         if self.signals.len() >= self.max_size {
             self.signals.pop_back();
         }
         self.signals.push_front(signal);
     }
 
-    pub fn get_recent_signals(&self) -> Vec<Signal> {
+    pub fn get_recent_signals(&self) -> Vec<Signal<T>> {
         let five_seconds_ago = Utc::now() - Duration::seconds(5);
         self.signals
             .iter()
             .filter(|signal| signal.rx_ts > five_seconds_ago)
-            .cloned() // Clone the signal to return owned values
-            .collect()
+            .cloned()
+            .collect::<Vec<Signal<T>>>()
     }
 }
