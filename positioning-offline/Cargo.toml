@@ -5,10 +5,10 @@ edition = "2024"
 
 [dependencies]
 "positioning" = { path = "../positioning" }
-beacons = { path = "../beacons", features = ["HCI", "OCT", "SON"] }
 
 log = { workspace = true }
 crossbeam-channel = { workspace = true }
 anyhow = { workspace = true }
 argmin = { workspace = true }
 argmin-math = { workspace = true }
+eth-beacons-indoor = "0.0.1"

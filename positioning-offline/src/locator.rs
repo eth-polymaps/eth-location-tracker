@@ -46,7 +46,7 @@ impl Locator {
         signals
             .iter()
             .flat_map(|s| {
-                let resolved_beacon = beacons::resolver::find_beacon_by_id(
+                let resolved_beacon = eth_beacons_indoor::resolver::find_beacon_by_id(
                     s.beacon.uuid.as_str(),
                     s.beacon.major,
                     s.beacon.minor,
