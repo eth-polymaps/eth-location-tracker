@@ -11,4 +11,4 @@ crossbeam-channel = { workspace = true }
 anyhow = { workspace = true }
 argmin = { workspace = true }
 argmin-math = { workspace = true }
-eth-beacons-indoor = "0.0.1"
+eth-beacons-indoor = { version = "0.0.2", features = ["OCT", "SON", "HG"] }
