@@ -1,9 +1,9 @@
-use embedded_svc::http::client::Client;
-use esp_idf_svc::http::client::{Configuration, EspHttpConnection};
-use log::debug;
 use crate::beacon::{BeaconId, Output};
 use crate::signal::Signal;
 use crate::{beacon, geographic};
+use embedded_svc::http::client::Client;
+use esp_idf_svc::http::client::{Configuration, EspHttpConnection};
+use log::debug;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::HashMap;

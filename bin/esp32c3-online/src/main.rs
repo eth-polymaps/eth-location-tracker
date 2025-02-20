@@ -9,8 +9,8 @@ use esp_idf_svc::eventloop::EspSystemEventLoop;
 use esp_idf_svc::nvs::EspDefaultNvsPartition;
 use log::{LevelFilter, error, info};
 use positioning::beacon::{BeaconId, Output};
-use positioning::signal::{Processor, Signal};
 use positioning::online::Locator;
+use positioning::signal::{Processor, Signal};
 use std::thread;
 
 fn main() {

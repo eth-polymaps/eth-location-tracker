@@ -1,10 +1,10 @@
 mod http;
 
+use crate::beacon::{BeaconId, Output};
 use crate::online::http::HttpClient;
+use crate::signal::Signal;
 use crossbeam_channel::{Receiver, Sender, select};
 use log::error;
-use crate::beacon::{BeaconId, Output};
-use crate::signal::Signal;
 use std::thread;
 use std::thread::JoinHandle;
 

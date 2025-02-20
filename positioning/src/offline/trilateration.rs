@@ -1,9 +1,9 @@
 use log::info;
 use std::time::Instant;
 
+use crate::geographic::{Position, haversine_distance};
 use argmin::core::{CostFunction, Error, Executor};
 use argmin::solver::neldermead::NelderMead;
-use crate::geographic::{Position, haversine_distance};
 
 struct Quadratic {
     measurements: Vec<Measurement>,
