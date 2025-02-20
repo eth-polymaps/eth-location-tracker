@@ -1,6 +1,6 @@
 # ETH Location Tracker
 
-## Online Version
+## Offline Version
 
 ### Build
 ```

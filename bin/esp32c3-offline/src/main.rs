@@ -31,7 +31,7 @@ fn main() {
     let locator = Locator::default();
     let locator_thread = locator
         .start(signal_rx, position_tx)
-        .expect("Unable to start locator");
+        .expect("Failed to start locator");
 
     let display_updater = thread::Builder::new()
         .name("display updater".to_string())
@@ -54,6 +54,7 @@ fn main() {
                 select! {
                     recv(position_rx) -> enc => match enc {
                         Ok(output) => {
+                           info!("Sending position {:?} and room {:?} to display", output.position, output.location);
                            if let Err(e) = display.lat_lon(output) {
                                 error!("Error writing display from chan: {:?}", e);
                                 return;

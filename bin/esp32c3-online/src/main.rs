@@ -57,8 +57,8 @@ fn main() {
                 peripherals.pins.gpio5.into(),
                 peripherals.pins.gpio4.into(),
             )
-            .context("Error creating display")
-            .unwrap();
+                .context("Error creating display")
+                .unwrap();
 
             if let Err(e) = display.lat_lon(Output::default()) {
                 error!("Error writing display: {:?}", e);
