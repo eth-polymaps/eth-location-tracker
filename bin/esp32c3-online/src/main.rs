@@ -10,7 +10,7 @@ use esp_idf_svc::nvs::EspDefaultNvsPartition;
 use log::{LevelFilter, error, info};
 use positioning::beacon::{BeaconId, Output};
 use positioning::signal::{Processor, Signal};
-use positioning_online::Locator;
+use positioning::online::Locator;
 use std::thread;
 
 fn main() {
