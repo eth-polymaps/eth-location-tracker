@@ -3,7 +3,7 @@ use std::time::Instant;
 
 use argmin::core::{CostFunction, Error, Executor};
 use argmin::solver::neldermead::NelderMead;
-use positioning::geographic::{Position, haversine_distance};
+use crate::geographic::{Position, haversine_distance};
 
 struct Quadratic {
     measurements: Vec<Measurement>,

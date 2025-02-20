@@ -3,8 +3,15 @@ name = "positioning"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+offline = ["argmin", "argmin-math", "eth-beacons-indoor"]
+
 [dependencies]
+anyhow = { workspace = true }
 chrono = { workspace = true }
 crossbeam-channel = { workspace = true }
 log = { workspace = true }
 
+argmin = { workspace = true, optional = true }
+argmin-math = { workspace = true, optional = true }
+eth-beacons-indoor = { version = "0.0.9", features = ["OCT", "SON", "HG"], optional = true }

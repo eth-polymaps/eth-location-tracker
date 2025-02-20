@@ -1,5 +1,5 @@
 [workspace]
-members = [ "bin/*", "connect", "positioning", "positioning-offline", "positioning-online"]
+members = [ "bin/*", "connect", "positioning", "positioning-online"]
 resolver = "2"
 
 [profile.release]

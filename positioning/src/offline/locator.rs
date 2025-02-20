@@ -1,8 +1,8 @@
-use crate::trilateration::trilaterate;
+use crate::offline::trilateration::trilaterate;
 use log::{error, info};
-use positioning::beacon::{Beacon, BeaconId, Output, Room};
-use positioning::geographic::Position;
-use positioning::signal::Signal;
+use crate::beacon::{Beacon, BeaconId, Output, Room};
+use crate::geographic::Position;
+use crate::signal::Signal;
 
 #[derive(Default)]
 pub struct Locator {}

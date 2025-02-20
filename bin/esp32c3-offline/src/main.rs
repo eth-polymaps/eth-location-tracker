@@ -7,7 +7,7 @@ use esp_idf_hal::task::block_on;
 use log::{LevelFilter, error, info};
 use positioning::beacon::{BeaconId, Output};
 use positioning::signal::{Processor, Signal};
-use positioning_offline::Locator;
+use positioning::offline::Locator;
 use std::thread;
 
 fn main() {
