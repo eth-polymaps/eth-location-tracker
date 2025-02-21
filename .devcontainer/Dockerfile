@@ -62,6 +62,7 @@ RUN if [ -n "${GITHUB_TOKEN}" ]; then export GITHUB_TOKEN=${GITHUB_TOKEN}; fi  \
 RUN rustup default nightly
 
 RUN rustup target add riscv32imc-unknown-none-elf
+RUN rustup component add clippy
 
 
 # Activate ESP environment

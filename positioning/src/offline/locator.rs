@@ -1,8 +1,8 @@
-use crate::trilateration::trilaterate;
+use crate::beacon::{Beacon, BeaconId, Output, Room};
+use crate::geographic::Position;
+use crate::offline::trilateration::trilaterate;
+use crate::signal::Signal;
 use log::{error, info};
-use positioning::beacon::{Beacon, BeaconId, Output, Room};
-use positioning::geographic::Position;
-use positioning::signal::Signal;
 
 #[derive(Default)]
 pub struct Locator {}
@@ -64,7 +64,7 @@ impl Locator {
                 resolved_beacon.map(|b| {
                     let id = BeaconId::new(b.id.uuid, b.id.major, b.id.minor);
                     let loc = &b.location;
-                    let location = Room::new(loc.building, loc.floor, loc.room);
+                    let location = Room::new(loc.building.as_ref(), loc.floor, loc.room);
                     let position = Position::new(b.position.lat, b.position.lon);
 
                     Signal::new(Beacon::new(id, location, position), s.tx_power, s.rssi)

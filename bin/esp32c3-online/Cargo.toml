@@ -11,8 +11,7 @@ harness = false # do not use the built in cargo test harness -> resolve rust-ana
 
 
 [dependencies]
-positioning = { path = "../../positioning" }
-positioning-online = { path = "../../positioning-online" }
+positioning = { path = "../../positioning", features = ["online"] }
 connect = { path = "../../connect" }
 
 log = { workspace = true }

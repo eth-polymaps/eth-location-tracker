@@ -3,8 +3,23 @@ name = "positioning"
 version = "0.1.0"
 edition = "2024"
 
+[features]
+offline = ["argmin", "argmin-math", "eth-beacons-indoor"]
+online = ["serde", "serde_json", "esp-idf-svc", "embedded-svc"]
+
 [dependencies]
+anyhow = { workspace = true }
 chrono = { workspace = true }
 crossbeam-channel = { workspace = true }
 log = { workspace = true }
 
+# offline dependencies
+argmin = { workspace = true, optional = true }
+argmin-math = { workspace = true, optional = true }
+eth-beacons-indoor = { version = "0.0.17", features = ["OCT", "SON", "HG"], optional = true }
+
+# online dependencies
+serde = { version = "1.0.217", features = ["derive"], optional = true }
+serde_json = { version = "1.0", optional = true }
+esp-idf-svc = { workspace = true, optional = true }
+embedded-svc = { workspace = true, optional = true }

@@ -2,10 +2,10 @@ mod locator;
 mod signal;
 mod trilateration;
 
+use crate::beacon::{BeaconId, Output};
+use crate::signal::Signal;
 use crossbeam_channel::{Receiver, Sender, select};
 use log::error;
-use positioning::beacon::{BeaconId, Output};
-use positioning::signal::Signal;
 use std::thread;
 use std::thread::JoinHandle;
 
